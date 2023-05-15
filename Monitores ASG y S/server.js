@@ -21,9 +21,9 @@ const packageDefinition = protoLoader.loadSync(
 
 const proto = grpc.loadPackageDefinition(packageDefinition);
 
-async function checkHosts() {//Ciclo que sucede cuando la MOM no es la principal
+async function checkHosts() {
   var available = 0;
-  for (let i = 0; i < HOSTS.length; i++) {//Mira cuantas MOM estan funcionando
+  for (let i = 0; i < HOSTS.length; i++) {//Mira cuantas estan funcionando
     CurrentHosts[i].CheckOnline({}, (err, data) => {
       if (!err)
         available += 1;
@@ -31,11 +31,10 @@ async function checkHosts() {//Ciclo que sucede cuando la MOM no es la principal
   }
   await wait(1000);//Espera que todas puedan responder
   console.log('Available: ', available);
-  if (available == 0) {//Si no hay MOMs funcionando, esta toma ese rol
+  if (available == 0) {//Si no hay
     console.log("No available!!!");
-  } else {
-    setTimeout(function () { checkHosts(); }, 2000);//Si ya hay una MOM funcional, vuelve a mirar por si pierde funcionalidad
   }
+  setTimeout(function () { checkHosts(); }, 2000);
 }
 
 const microService = grpc.loadPackageDefinition(packageDefinition).MicroService;
@@ -44,7 +43,7 @@ function main() {
   for (let i = 0; i < HOSTS.length; i++) {//Se inicia la conexion con todos los micro servicios
     CurrentHosts[i + 1] = new microService(HOSTS[i], grpc.credentials.createInsecure());
   }
-  checkHosts();//Se mira si ya hay un MOM principal, o toma ese rol
+  checkHosts();
 };
 
 main();
