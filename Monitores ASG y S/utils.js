@@ -73,40 +73,6 @@ export function sendDelete(id, proxy) {//Enviar al Proxy confirmacion de la elim
     });
 }
 
-export function caesarCrypt(unencoded) {//Encriptar el string
-    let str = unencoded;
-    let result = '';
-    for (let i = str.length - 1; i >= 0; i--) {
-        let charCode = str.charCodeAt(i);
-        let newCharCode = charCode + 13;
-        if (newCharCode > 122)
-            newCharCode -= 24
-        let newChar;
-        if (newCharCode == 96)
-            result += 'h';
-        else {
-            newChar = String.fromCharCode(newCharCode);
-            result += newChar;
-        }
-    }
-    return result;
-}
-
-export function caesarCryptog(unencoded) {//Encriptar un numero
-    const unencodedString = unencoded.toString();
-    let encoded = '';
-    for (let i = 0; i < unencodedString.length; i++) {
-        const charCode = unencodedString.charCodeAt(i);
-        if (charCode >= 48 && charCode <= 57) {
-            const newDigit = ((charCode - 48 + shift) % 10);
-            encoded += newDigit.toString();
-        } else {
-            encoded += unencodedString[i];
-        }
-    }
-    return parseInt(encoded);
-}
-
 export function wait(ms) {//Metodo para esperar cierta cantidad de milisegundos
     return new Promise(resolve => {
         setTimeout(resolve, ms);

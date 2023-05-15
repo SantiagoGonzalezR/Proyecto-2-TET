@@ -8,6 +8,8 @@ const PROTO_PATH = process.env.PROTO_PATH;
 const HOSTS = process.env.HOSTS.split(',');
 const maxHosts = HOSTS.length;
 const CurrentHosts = new Array(maxHosts);
+const fs = require('fs');
+const Connections = 'maquinas.json';
 
 const packageDefinition = protoLoader.loadSync(
   PROTO_PATH,
@@ -26,8 +28,17 @@ async function checkHosts() {
   for (let i = 0; i < HOSTS.length; i++) {//Mira cuantas estan funcionando
     CurrentHosts[i].CheckOnline({}, (err, data) => {
       if (err) {
-        //Que hacer si no se puede conectar con uno especifico
+        delete Connections[i];
+        delete HOSTS[i];
       } else {
+        try {
+          const ip = data.request.ip;
+          const json = JSON.parse(fs.readFileSync(Connections, 'utf8'));
+          json[ip] = data.request.process;
+          fs.writeFileSync(Connections, JSON.stringify(json, null, 2), 'utf8');
+        } catch (err) {
+          console.error('Error:', err);
+        }
         available += 1;
       }
     });
@@ -35,7 +46,7 @@ async function checkHosts() {
   await wait(1000);//Espera que todas puedan responder
   console.log('Available: ', available);
   if (available == 0) {//Si no hay ninguno
-    console.log("No available!!!");
+    console.log("No machines available!!!");
   }
   setTimeout(function () { checkHosts(); }, 2000);
 }

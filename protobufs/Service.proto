@@ -8,5 +8,6 @@ message non{
 }
 
 message Response{
-    bool status = 1;
+    string ip = 1;
+    int process = 2;
 }

@@ -8,12 +8,10 @@ mc = MicroService()
 
 
 def tiempoEjecucion(self):
+    host="[::]:8080"
     startTime = time.time()
     processCap = (time.time - startTime) / 2.5
     while True:
-        sendData(processCap)
+        mc(host, processCap)
         processCap = (time.time - startTime) / 2.5
 
-
-def sendData(processCap):
-    return "Enviar processCap por gRPC"
