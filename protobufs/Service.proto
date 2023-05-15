@@ -1,14 +1,12 @@
 syntax = "proto3";
 
 service MicroService{
-    rpc SendString(str) returns (Response) {}
+    rpc CheckOnline(non) returns (Response) {}
 }
 
-message str{
-    string item = 1;
+message non{
 }
 
 message Response{
     bool status = 1;
-    string response = 2;
 }
