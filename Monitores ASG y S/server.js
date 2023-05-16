@@ -5,9 +5,6 @@ import protoLoader from '@grpc/proto-loader';
 dotenv.config()
 //Entender el contenido del archivo .env
 const PROTO_PATH = process.env.PROTO_PATH;
-const HOSTS = process.env.HOSTS.split(',');
-const maxHosts = HOSTS.length;
-const CurrentHosts = new Array(maxHosts);
 const fs = require('fs');
 const Connections = 'maquinas.json';
 
@@ -24,6 +21,8 @@ const packageDefinition = protoLoader.loadSync(
 const proto = grpc.loadPackageDefinition(packageDefinition);
 
 async function checkHosts() {
+  var HOSTS = process.env.HOSTS.split(',');
+  var CurrentHosts = new Array(5);
   var available = 0;
   for (let i = 0; i < HOSTS.length; i++) {//Mira cuantas estan funcionando
     CurrentHosts[i].CheckOnline({}, (err, data) => {
@@ -32,7 +31,7 @@ async function checkHosts() {
         delete HOSTS[i];
       } else {
         try {
-          const ip = data.request.ip;
+          var ip = data.request.ip;
           const json = JSON.parse(fs.readFileSync(Connections, 'utf8'));
           json[ip] = data.request.process;
           fs.writeFileSync(Connections, JSON.stringify(json, null, 2), 'utf8');
