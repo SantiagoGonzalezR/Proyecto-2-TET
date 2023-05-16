@@ -5,8 +5,9 @@ import protoLoader from '@grpc/proto-loader';
 dotenv.config()
 //Entender el contenido del archivo .env
 const PROTO_PATH = process.env.PROTO_PATH;
+const maxHosts = 5;
+const CurrentHosts = new Array(maxHosts);
 const fs = require('fs');
-const Connections = 'maquinas.json';
 
 const packageDefinition = protoLoader.loadSync(
   PROTO_PATH,
@@ -21,23 +22,41 @@ const packageDefinition = protoLoader.loadSync(
 const proto = grpc.loadPackageDefinition(packageDefinition);
 
 async function checkHosts() {
-  var HOSTS = process.env.HOSTS.split(',');
-  var CurrentHosts = new Array(5);
+  const jsonData = fs.readFileSync('maquinas.json', 'utf8');
+
+  // Convertir el json en un objeto
+  const jsonObject = JSON.parse(jsonData);
+
+  // Crear una lista con las IPs para la conexion por gRPC
+  const HOSTS = Object.keys(jsonObject);
+  // Agregar el puerto para la conexion y crear dicha conexion
+  const port=':8080';
+  for (let i=0; i < HOSTS.length; i++){
+    HOSTS[i]+=port;
+    CurrentHosts[i] = new microService(HOSTS[i], grpc.credentials.createInsecure())
+  }
+
+  const newJsonData = {};
+
+  // Agregar los valores al diccionario
+  for (const key in jsonObject) {
+    newJsonData[key] = jsonObject[key];
+  }
   var available = 0;
   for (let i = 0; i < HOSTS.length; i++) {//Mira cuantas estan funcionando
     CurrentHosts[i].CheckOnline({}, (err, data) => {
+      const char = ':';
+      const portless = HOSTS[i].substring(0, HOSTS[i].indexOf(char));
       if (err) {
-        delete Connections[i];
-        delete HOSTS[i];
-      } else {
-        try {
-          var ip = data.request.ip;
-          const json = JSON.parse(fs.readFileSync(Connections, 'utf8'));
-          json[ip] = data.request.process;
-          fs.writeFileSync(Connections, JSON.stringify(json, null, 2), 'utf8');
-        } catch (err) {
-          console.error('Error:', err);
+        if (portless in newJsonData){}
+        else{
+          delete HOSTS[i];
+          delete CurrentHosts[i];
         }
+      } else {
+        newJsonData[portless] = data.request.process;
+        const modifiedJsonData = JSON.stringify(newJsonData, null, 2);
+        fs.writeFileSync('maquinas.json', modifiedJsonData, 'utf8');
         available += 1;
       }
     });
@@ -45,7 +64,7 @@ async function checkHosts() {
   await wait(1000);//Espera que todas puedan responder
   console.log('Available: ', available);
   if (available == 0) {//Si no hay ninguno
-    console.log("No machines available!!!");
+    console.log("No machine available!!!");
   }
   setTimeout(function () { checkHosts(); }, 2000);
 }
@@ -53,9 +72,6 @@ async function checkHosts() {
 const microService = grpc.loadPackageDefinition(packageDefinition).MicroService;
 
 function main() {
-  for (let i = 0; i < maxHosts; i++) {//Se inicia la conexion con todos los micro servicios
-    CurrentHosts[i] = new microService(HOSTS[i], grpc.credentials.createInsecure());
-  }
   checkHosts();
 };
 
