@@ -12,9 +12,9 @@ newInstances=[]
 
 
 resource_ec2=boto3.client("ec2",
-                        aws_access_key_id='ASIAVF6MNOPEDQW347AI',
-                        aws_secret_access_key='PfaqtmK0Ljr2nLSZ/zgnBh34DoPQQnfNWSxSa3Rm',
-                        aws_session_token='FwoGZXIvYXdzEBkaDDPhS9Xi162lqWE63SLIAQxohdZ1LU0kGI5D6a6h8sd5aWQweZTV66zwlzvkU4kzdN8h6fFtVPOeSqzVNUui081Qnx/3o3u9Ry8woo0phxGE3CW1LmW+p0yTUzgW3cO91sPeVfojyiy8XgFABVj1gZsyzvOspO9zcuXDCRsdyuMxsP4cKCRsoLr7CF92r1vrGfJfSd76NXDn1vnCTIvB8A25Nx6vkhH1r9IXURtc/5yfbhWI1j2hBOCW6yCiogUStB9heEGzYlPKpRW76SsQKIPx2sJIBg2uKNjOjqMGMi3K1U6+AIfatGpNJO9MYBAJWF9PW7bgJZkT3efI0yyrIVcqZBkcNCa9mmIBbeQ=',
+                        aws_access_key_id='ASIAVF6MNOPEBIH2HSFV',
+                        aws_secret_access_key='iCziLijyAjP1neT0ABcAg5LLzlbUWvRhStm/sgKe',
+                        aws_session_token='FwoGZXIvYXdzECMaDIRfPbYuDYYmHRfYmCLIAcYPRI0UZSYmT/84bQqXTik0Dv5LGEcn1IbSj7yQ42ZyMhWuflz/ncqvkgDjMNbTkP6HyK904aJBFHx1rMMU9XoUX2BIQM7+pNzHOOeml4SuasQUMFMi8m//H6ugoHQ45xA/mMMBnhTa9qnA56H0GcN1wSYR4oU6tBn1LGYNlMBj/iezHCB87eHRU4BXAFdhPef0x2gphoexMEMjcnYn0kb/y1xe7NURZpjQExqK2BC93VhncDEo/WHdWAOrSRS1hLMuFLbwc8LrKJDWkKMGMi1qMQbvPlQTbedF2lH9k5gUtMNcvVagL3o7j7QC4USjeJyHM8PeIsOuF0ZakVM=',
                         region_name='us-east-1')  
 
 
@@ -56,21 +56,36 @@ def get_new_instance():
     except Exception as e:
         print(e)
 
+def terminate_with_ip(ipv4_pub):
+    filters = [
+    {
+        'Name': 'instance-state-name',
+        'Values': ['running']
+    }
+]
+    response = resource_ec2.describe_instances(Filters=filters)
+    for reservation in response['Reservations']:
+        for instance in reservation['Instances']:
+            if 'PublicIpAddress' in instance and instance['PublicIpAddress'] == ipv4_pub:
+                # La instancia con la dirección IP deseada fue encontrada
+                instance_id = instance['InstanceId']
+                try:
+                    print ("Terminate EC2 instance")
+                    print(resource_ec2.terminate_instances(InstanceIds=[instance_id]))
+                    newInstances.remove(instance_id)
+                    return "Instance " + instance_id+ " terminated"
+                except Exception as e:
+                    print(e)
+                    return 
+            
+    print("Couldn't find any instance with that Public IP Address")
+
 def get_ipv4(instance_id):
     response = resource_ec2.describe_instances(InstanceIds=[instance_id])
     ipv4_publico = response['Reservations'][0]['Instances'][0]['PublicIpAddress']
     print(f"La dirección IPv4 pública de la instancia {instance_id} es {ipv4_publico}")
     return [instance_id, ipv4_publico]
 
-def terminate_ec2_instance(instance_id):
-    try:
-        print ("Terminate EC2 instance")
-        print(resource_ec2.terminate_instances(InstanceIds=[instance_id]))
-        newInstances.remove(instance_id)
-        return "Instacia " + instance_id+ " terminada"
-    except Exception as e:
-        print(e)
-        return 
 
 def minimum_instances():
     if len(newInstances)<2:
@@ -79,3 +94,6 @@ def minimum_instances():
 
 if __name__ == "__main__":
     create_ec2_instance()
+    print("Ip de la instancia: ")
+    ip = input()
+    terminate_with_ip(ip)
