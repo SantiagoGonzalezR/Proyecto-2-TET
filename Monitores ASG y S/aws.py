@@ -2,6 +2,7 @@ import boto3
 import boto3.session
 from concurrent import futures
 import json
+import time
 
 HOST = '[::]:8080'
 my_session = boto3.session.Session()
@@ -10,6 +11,7 @@ my_session = boto3.session.Session()
 data={}
 oldInstances=[]
 newInstances=[]
+path = 'C:\\Users\\santi\\Desktop\\Universidad\\Semestre 7\\Proyecto 2 top telem\\Proyecto-2-TET\\Monitores ASG y S\\maquinas.json'
 
 
 resource_ec2=boto3.client("ec2",
@@ -52,12 +54,13 @@ def get_new_instance():
         for reservation in response['Reservations']:
             for instance in reservation['Instances']:
                 actualid=instance['InstanceId']
-                ip=get_ipv4(instance['InstanceId'])
                 # Guardar la ip en el .json para usar conjunto a server.js
-                data[ip]=0
-                with open('maquinas.json', 'w') as json_file:
-                    json.dump(data, json_file)
                 if actualid not in oldInstances:
+                    time.sleep(60)
+                    ip=get_ipv4(instance['InstanceId'])
+                    data[ip[0]]=0
+                    with open(path, 'w') as json_file:
+                        json.dump(data, json_file)
                     newInstances.append(instance['InstanceId'])
     except Exception as e:
         print(e)
@@ -95,19 +98,20 @@ def get_ipv4(instance_id):
 
 if __name__ == "__main__":
     #Limpieza del json
-    with open('maquinas.json', 'r') as json_file:
+    with open(path, 'r') as json_file:
         data = json.load(json_file)
     for values in data:
         del data[values]
     #Inicializacion del ciclo del auto scaling
     while True:
-        with open('maquinas.json', 'r') as json_file:
+        with open(path, 'r') as json_file:
             data = json.load(json_file)
         if len(data) < 5:
             create_ec2_instance()
+            time.sleep(3)
         for key,  value in data.items():
             if value >= 60:
                 terminate_with_ip(key)
                 del data[key]
-                with open('maquinas.json', 'w') as json_file:
+                with open(path, 'w') as json_file:
                     json.dump(data, json_file)
