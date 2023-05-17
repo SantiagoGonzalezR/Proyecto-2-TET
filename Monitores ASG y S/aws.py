@@ -94,6 +94,12 @@ def get_ipv4(instance_id):
 
 
 if __name__ == "__main__":
+    #Limpieza del json
+    with open('maquinas.json', 'r') as json_file:
+        data = json.load(json_file)
+    for values in data:
+        del data[values]
+    #Inicializacion del ciclo del auto scaling
     while True:
         with open('maquinas.json', 'r') as json_file:
             data = json.load(json_file)

@@ -54,7 +54,7 @@ async function checkHosts() {
           delete CurrentHosts[i];
         }
       } else {
-        newJsonData[portless] = parseFloat(data.request.time);
+        newJsonData[portless] = parseFloat(data.time);
         const modifiedJsonData = JSON.stringify(newJsonData, null, 2);
         fs.writeFileSync('maquinas.json', modifiedJsonData, 'utf8');
         available += 1;
