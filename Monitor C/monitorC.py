@@ -13,7 +13,7 @@ class MicroService(Service_pb2_grpc.MicroServiceServicer):
         self.startTime = time.time()
 
     def CheckOnline(self, response, context):
-        processCap = (time.time - self.startTime) / 2.5
+        processCap = (time.time() - self.startTime) / 2.5
         return Service_pb2.Response(time=str(processCap))
 
 
