@@ -21,7 +21,7 @@ const packageDefinition = protoLoader.loadSync(
 
 const proto = grpc.loadPackageDefinition(packageDefinition);
 
-async function checkHosts() {
+function checkHosts() {
   const jsonData = fs.readFileSync('maquinas.json', 'utf8');
 
   // Convertir el json en un objeto
@@ -61,7 +61,10 @@ async function checkHosts() {
       }
     });
   }
-  await wait(1000);//Espera que todas puedan responder
+  setTimeout(function () { availablef(available); }, 1000);
+}
+
+function availablef(available){
   console.log('Available: ', available);
   if (available == 0) {//Si no hay ninguno
     console.log("No machine available!!!");
