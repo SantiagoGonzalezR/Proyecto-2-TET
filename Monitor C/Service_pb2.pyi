@@ -5,12 +5,10 @@ from typing import ClassVar as _ClassVar, Optional as _Optional
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class Response(_message.Message):
-    __slots__ = ["ip", "process"]
-    IP_FIELD_NUMBER: _ClassVar[int]
-    PROCESS_FIELD_NUMBER: _ClassVar[int]
-    ip: str
-    process: int
-    def __init__(self, ip: _Optional[str] = ..., process: _Optional[int] = ...) -> None: ...
+    __slots__ = ["time"]
+    TIME_FIELD_NUMBER: _ClassVar[int]
+    time: str
+    def __init__(self, time: _Optional[str] = ...) -> None: ...
 
 class non(_message.Message):
     __slots__ = []

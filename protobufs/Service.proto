@@ -8,6 +8,5 @@ message non{
 }
 
 message Response{
-    string ip = 1;
-    int32 process = 2;
+    string time = 1;
 }
