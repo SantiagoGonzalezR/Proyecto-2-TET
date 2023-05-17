@@ -11,13 +11,13 @@ my_session = boto3.session.Session()
 data={}
 oldInstances=[]
 newInstances=[]
-path = 'C:\\Users\\santi\\Desktop\\Universidad\\Semestre 7\\Proyecto 2 top telem\\Proyecto-2-TET\\Monitores ASG y S\\maquinas.json'
+path = 'maquinas.json'
 
 
 resource_ec2=boto3.client("ec2",
-                        aws_access_key_id='ASIAVF6MNOPEBIH2HSFV',
-                        aws_secret_access_key='iCziLijyAjP1neT0ABcAg5LLzlbUWvRhStm/sgKe',
-                        aws_session_token='FwoGZXIvYXdzECMaDIRfPbYuDYYmHRfYmCLIAcYPRI0UZSYmT/84bQqXTik0Dv5LGEcn1IbSj7yQ42ZyMhWuflz/ncqvkgDjMNbTkP6HyK904aJBFHx1rMMU9XoUX2BIQM7+pNzHOOeml4SuasQUMFMi8m//H6ugoHQ45xA/mMMBnhTa9qnA56H0GcN1wSYR4oU6tBn1LGYNlMBj/iezHCB87eHRU4BXAFdhPef0x2gphoexMEMjcnYn0kb/y1xe7NURZpjQExqK2BC93VhncDEo/WHdWAOrSRS1hLMuFLbwc8LrKJDWkKMGMi1qMQbvPlQTbedF2lH9k5gUtMNcvVagL3o7j7QC4USjeJyHM8PeIsOuF0ZakVM=',
+                        aws_access_key_id='ASIAVF6MNOPEEQEBM3X7',
+                        aws_secret_access_key='n0GBex5j7AmwphXzzrrOUvntXsOyuB8ExAqxCGXR',
+                        aws_session_token='FwoGZXIvYXdzEDIaDGABLY6iSDTAvTBm1iLIAVQ1Ze9L2IXPiQsz5hXw0NzgiHDNr7xNPzYbygQuv0eSmkuScNyXAUfJhP/aLeIPiYnPr+TjNtE8jTe6+k61EaZmjqc2XvKycun6OQLseWFLhoU9IfPwhC9Pj7dQyA0+zwgbiAyno1RyYXlzyLQ+haGFld35oY3LOpcq95f+RAA8WUmJ4MOizOUAU+cDaN/VLay1MVx7WlHmcP3u2RKDimJs9ojzrvKUeCzBX52LYtehJ+hz+17vzjDs/ANqGnrT82TWPwtF31BdKPyDlKMGMi34ei52+uU3DeskCkv5lAhewCGy3w7Csqipi5vJnhGI2epH70Y46liXLLZKlhU=',
                         region_name='us-east-1')  
 
 

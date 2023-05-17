@@ -1,8 +1,7 @@
-const dotenv = require('dotenv').config();
+require('dotenv').config();
 const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 
-dotenv.config()
 //Entender el contenido del archivo .env
 const PROTO_PATH = process.env.PROTO_PATH;
 const maxHosts = 5;
