@@ -31,6 +31,7 @@ def create_ec2_instance():
             MaxCount=1,
             InstanceType="t2.micro",
             KeyName="TET2023")
+        time.sleep(60)
         get_new_instance()
         
     except Exception as e:
