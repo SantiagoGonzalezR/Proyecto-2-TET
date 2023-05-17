@@ -1,6 +1,6 @@
-import dotenv from 'dotenv';
 import grpc from '@grpc/grpc-js';
 import protoLoader from '@grpc/proto-loader';
+const dotenv = require('dotenv')
 
 dotenv.config()
 //Entender el contenido del archivo .env
