@@ -30,9 +30,9 @@ async function checkHosts() {
   // Crear una lista con las IPs para la conexion por gRPC
   const HOSTS = Object.keys(jsonObject);
   // Agregar el puerto para la conexion y crear dicha conexion
-  const port=':8080';
-  for (let i=0; i < HOSTS.length; i++){
-    HOSTS[i]+=port;
+  const port = ':8080';
+  for (let i = 0; i < HOSTS.length; i++) {
+    HOSTS[i] += port;
     CurrentHosts[i] = new microService(HOSTS[i], grpc.credentials.createInsecure())
   }
 
@@ -48,13 +48,13 @@ async function checkHosts() {
       const char = ':';
       const portless = HOSTS[i].substring(0, HOSTS[i].indexOf(char));
       if (err) {
-        if (portless in newJsonData){}
-        else{
+        if (portless in newJsonData) { }
+        else {
           delete HOSTS[i];
           delete CurrentHosts[i];
         }
       } else {
-        newJsonData[portless] = data.request.process;
+        newJsonData[portless] = parseFloat(data.request.time);
         const modifiedJsonData = JSON.stringify(newJsonData, null, 2);
         fs.writeFileSync('maquinas.json', modifiedJsonData, 'utf8');
         available += 1;
