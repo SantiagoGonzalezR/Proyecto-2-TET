@@ -9,5 +9,5 @@ message non{
 
 message Response{
     string ip = 1;
-    int process = 2;
+    int32 process = 2;
 }
