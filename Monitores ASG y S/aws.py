@@ -7,6 +7,7 @@ HOST = '[::]:8080'
 my_session = boto3.session.Session()
 
 
+data={}
 oldInstances=[]
 newInstances=[]
 
@@ -51,6 +52,11 @@ def get_new_instance():
         for reservation in response['Reservations']:
             for instance in reservation['Instances']:
                 actualid=instance['InstanceId']
+                ip=get_ipv4(instance['InstanceId'])
+                # Guardar la ip en el .json para usar conjunto a server.js
+                data[ip]=0
+                with open('maquinas.json', 'w') as json_file:
+                    json.dump(data, json_file)
                 if actualid not in oldInstances:
                     newInstances.append(instance['InstanceId'])
     except Exception as e:
@@ -84,16 +90,18 @@ def get_ipv4(instance_id):
     response = resource_ec2.describe_instances(InstanceIds=[instance_id])
     ipv4_publico = response['Reservations'][0]['Instances'][0]['PublicIpAddress']
     print(f"La dirección IPv4 pública de la instancia {instance_id} es {ipv4_publico}")
-    return [instance_id, ipv4_publico]
+    return [ipv4_publico]
 
-
-def minimum_instances():
-    if len(newInstances)<2:
-        while len(newInstances)<2: 
-            create_ec2_instance()
 
 if __name__ == "__main__":
-    create_ec2_instance()
-    print("Ip de la instancia: ")
-    ip = input()
-    terminate_with_ip(ip)
+    while True:
+        with open('maquinas.json', 'r') as json_file:
+            data = json.load(json_file)
+        if len(data) < 5:
+            create_ec2_instance()
+        for key,  value in data.items():
+            if value >= 60:
+                terminate_with_ip(key)
+                del data[key]
+                with open('maquinas.json', 'w') as json_file:
+                    json.dump(data, json_file)
