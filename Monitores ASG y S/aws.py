@@ -13,12 +13,14 @@ oldInstances=[]
 newInstances=[]
 path = 'maquinas.json'
 
+lt={'LaunchTemplateId':'lt-0b7e0afb8992c038e'}
+
 
 resource_ec2=boto3.client("ec2",
-                        aws_access_key_id='ASIAVF6MNOPEEQEBM3X7',
-                        aws_secret_access_key='n0GBex5j7AmwphXzzrrOUvntXsOyuB8ExAqxCGXR',
-                        aws_session_token='FwoGZXIvYXdzEDIaDGABLY6iSDTAvTBm1iLIAVQ1Ze9L2IXPiQsz5hXw0NzgiHDNr7xNPzYbygQuv0eSmkuScNyXAUfJhP/aLeIPiYnPr+TjNtE8jTe6+k61EaZmjqc2XvKycun6OQLseWFLhoU9IfPwhC9Pj7dQyA0+zwgbiAyno1RyYXlzyLQ+haGFld35oY3LOpcq95f+RAA8WUmJ4MOizOUAU+cDaN/VLay1MVx7WlHmcP3u2RKDimJs9ojzrvKUeCzBX52LYtehJ+hz+17vzjDs/ANqGnrT82TWPwtF31BdKPyDlKMGMi34ei52+uU3DeskCkv5lAhewCGy3w7Csqipi5vJnhGI2epH70Y46liXLLZKlhU=',
-                        region_name='us-east-1')  
+                        aws_access_key_id='ASIAVF6MNOPENAQ4MONF',
+                        aws_secret_access_key='xG/V1ITHTgSvFTY2h2Og+PmkzG1oS+vxhQnSZkBk',
+                        aws_session_token='FwoGZXIvYXdzEEsaDG/e8XphUj5oOGqhjyLIATnCVAFz2anJmms/qOfdbgfs/hWGkBMAY/xNqKTP1+91aamG+us47qA7h1pw0TU6HoM1RG/u1mcYafVIfxgpzYLA1EvtErAawP9pzboewfraW5Nhh1tpCMz9fUnZS2ROmxjXG61jJtoDczKwvEaQLdbwkUlx8d5KR8/6zxbNb987SlRA9RmeKZzLfna28e1TlcJb3JtZO/liJOirYJraELJH3wqrNiL12Gs+XLjKuKQmJNe25lUnAacysjn2mWRaul8R8uBgF37FKJ29maMGMi02cP/BYDxOi1I+hk7jSoKsJYuBo4G9u8eomvM6Xq24RaAh5xnwIoYHditonek=',
+                        region_name='us-east-1')
 
 
 def create_ec2_instance():
@@ -26,14 +28,14 @@ def create_ec2_instance():
     try:
         print ("Creating EC2 instance")
         resource_ec2.run_instances(
-            ImageId="ami-0d9344ceadea301a4",
+            LaunchTemplate=lt,
             MinCount=1,
             MaxCount=1,
             InstanceType="t2.micro",
             KeyName="TET2023")
         time.sleep(60)
         get_new_instance()
-        
+
     except Exception as e:
         print(e)
 
@@ -67,12 +69,12 @@ def get_new_instance():
         print(e)
 
 def terminate_with_ip(ipv4_pub):
+    print(ipv4_pub)
     filters = [
     {
         'Name': 'instance-state-name',
         'Values': ['running']
-    }
-]
+    }]
     response = resource_ec2.describe_instances(Filters=filters)
     for reservation in response['Reservations']:
         for instance in reservation['Instances']:
@@ -86,8 +88,8 @@ def terminate_with_ip(ipv4_pub):
                     return "Instance " + instance_id+ " terminated"
                 except Exception as e:
                     print(e)
-                    return 
-            
+                    return
+
     print("Couldn't find any instance with that Public IP Address")
 
 def get_ipv4(instance_id):
@@ -101,18 +103,21 @@ if __name__ == "__main__":
     #Limpieza del json
     with open(path, 'r') as json_file:
         data = json.load(json_file)
-    for values in data:
-        del data[values]
+    data.clear()
+    with open(path, 'w') as json_file:
+        json.dump(data, json_file)
     #Inicializacion del ciclo del auto scaling
     while True:
         with open(path, 'r') as json_file:
             data = json.load(json_file)
-        if len(data) < 5:
-            create_ec2_instance()
-            time.sleep(3)
-        for key,  value in data.items():
+        aux = data
+        for key,  value in aux.items():
+            proc=int(value)
             if value >= 60:
                 terminate_with_ip(key)
                 del data[key]
                 with open(path, 'w') as json_file:
                     json.dump(data, json_file)
+        if len(data) < 5:
+            create_ec2_instance()
+            time.sleep(3)
