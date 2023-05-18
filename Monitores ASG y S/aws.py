@@ -110,7 +110,7 @@ if __name__ == "__main__":
     while True:
         with open(path, 'r') as json_file:
             data = json.load(json_file)
-        aux = data
+        aux = data.copy()
         for key,  value in aux.items():
             proc=int(value)
             if value >= 60:
